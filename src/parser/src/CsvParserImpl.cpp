@@ -24,9 +24,32 @@ namespace Tbl
     const std::string c_gtw_item_a_number           = "apoint_number";
 }
 
-const std::string& CGtwTableParser::getDigitalKey() {return Tbl::c_gtw_table_d_routing;}
-const std::string& CGtwTableParser::getAnalogKey()  {return Tbl::c_gtw_table_a_routing;}
+CCsvPrserImpl::CCsvPrserImpl(const std::string& table_path)
+{
+    if (!boost::filesystem::exists(table_path))
+    {
+        throw std::runtime_error(std::string("configuration unavailable: file is not exist: ") + table_path );
+    }
+    else
+    {
+        try
+        {
 
+        }
+        catch (const std::exception& e)
+        {
+            std::cerr << "CsvParser: Error while parsing gtw file:" <<  e.what() << std::endl;
+            throw;
+        }
+    }
+}
+
+CCsvPrserImpl::~CCsvPrserImpl()
+{
+    std::cout << __func__ << ": CCsvParserImpl removed." << std::endl;
+}
+
+/*
 CGtwTableParser::CGtwTableParser(const std::string& table_path)
     : m_digital_max_number (0)
     , m_analog_max_number  (0)
@@ -96,19 +119,9 @@ CGtwTableParser::CGtwTableParser(const std::string& table_path)
     }
 }
 
-CGtwTableParser::~CGtwTableParser()
+CCsvPrserImpl::~CCsvPrserImpl()
 {
     std::cout << __func__ << ": CCsvParserImpl removed." << std::endl;
 }
-
-void CGtwTableParser::digitalCheckForMax(uint32_t value)
-{
-    if (m_digital_max_number < value) m_digital_max_number = value + 1;
-}
-
-void CGtwTableParser::analogCheckForMax(uint32_t value)
-{
-   if (m_analog_max_number < value) m_analog_max_number = value + 1;
-}
-
+*/
 } //namespase Parsers

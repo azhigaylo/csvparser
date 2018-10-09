@@ -7,7 +7,7 @@
 namespace Parsers
 {
 
-class CGtwTableParser final
+class CCsvPrserImpl final
 {
     public:
 
@@ -23,9 +23,10 @@ class CGtwTableParser final
 
        typedef std::pair <std::string, router_item_t> gwt_item_t;
 
-        explicit CGtwTableParser(const std::string& table_path);
-        ~CGtwTableParser();
+        explicit CCsvPrserImpl(const std::string& table_path);
+        ~CCsvPrserImpl();
 
+/*
         const std::vector<gwt_item_t>& getGwtTable()const {return m_gwt_vector; }
 
         static const std::string& getDigitalKey();
@@ -33,18 +34,16 @@ class CGtwTableParser final
 
         uint32_t getDigitalPointAmount()const {return m_digital_max_number;}
         uint32_t getAnalogPointAmount()const {return m_analog_max_number;}
-
+*/
     private:
 
-        CGtwTableParser(const CGtwTableParser&) = delete;
-        CGtwTableParser& operator=(const CGtwTableParser&) = delete;
-
-        void digitalCheckForMax(uint32_t value);
-        void analogCheckForMax(uint32_t value);
-
+        CCsvPrserImpl(const CCsvPrserImpl&) = delete;
+        CCsvPrserImpl& operator=(const CCsvPrserImpl&) = delete;
+/*
         std::vector<gwt_item_t> m_gwt_vector;
         uint32_t m_digital_max_number;
         uint32_t m_analog_max_number;
+*/
 };
 
 } //namespace Parsers
