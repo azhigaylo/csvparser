@@ -8,8 +8,7 @@
 #include <boost/filesystem.hpp>
 #include <boost/program_options.hpp>
 
-#include "common/slog.h"
-#include "gateway/MqttGatewayImpl.hpp"
+#include <parser/CsvParserImpl.hpp>
 
 namespace
 {
@@ -24,12 +23,12 @@ void signalHandler(int sig)
     case SIGTERM:
     case SIGINT:
     {
-        printDebug("MqttGateway/%s: Application termination requested [Signal:%i]", __FUNCTION__, sig);
+        std::cout << "CsvParser: Application termination requested [Signal:" << sig << "]" << std::endl;
         break;
     }
     default:
     {
-        printError("MqttGateway/%s: Fatal signal obtained: [Signal:%i], exit...", __FUNCTION__, sig);
+        std::cerr << "CsvParser: Fatal signal obtained: [Signal:" << sig << "], exit..." << std::endl;
         _exit(EXIT_FAILURE);
     }
     }
@@ -46,29 +45,20 @@ void configureSignalHandlers()
     sigaction(SIGINT, &sa, NULL);
 }
 
-bool isQuit()
-{
-    return is_interrupt != 0;
-}
-
 } // namespace
 
 int main(int argc, const char** argv)
 {
-    uint32_t debug_level;
-    uint32_t debug_sink;
-    boost::filesystem::path config_file;
+    boost::filesystem::path cvs_file;
     boost::filesystem::path gtw_table_file;
 
-    boost::program_options::options_description desc("HomeBrain core <-> MQTT Gateway Component Options");
+    boost::program_options::options_description desc("CSV file parser");
     desc.add_options()
-        ("help,h", "produce help message")
-        ("debug,d", boost::program_options::value<uint32_t>(&debug_level), "debug level 0-4(err/wr/info/dbg")
-        ("sink,s",  boost::program_options::value<uint32_t>(&debug_sink), "debug sink 0-1(console/dlt")
-        ("config,c",boost::program_options::value<boost::filesystem::path>(&config_file)->default_value("gtw_table.json"),
-                    std::string("Specify gatway table path. By default: 'gtw_table.json'").c_str())
-        ("table,t", boost::program_options::value<boost::filesystem::path>(&gtw_table_file)->default_value("gtw_config.json"),
-                    std::string("Specify config path. By default: 'gtw_config.json'").c_str());
+        ("help,h",    "produce help message")
+        ("csv file,i", boost::program_options::value<boost::filesystem::path>(&cvs_file)->default_value(""),
+                       std::string("Specify *.csv file with project information").c_str())
+        ("gtw file,o", boost::program_options::value<boost::filesystem::path>(&gtw_table_file)->default_value(""),
+                       std::string("Specify gatway table path.").c_str());
 
     boost::program_options::variables_map vm;
     try
@@ -78,7 +68,7 @@ int main(int argc, const char** argv)
     }
     catch (const boost::program_options::error& e)
     {
-        std::cerr << "Error while parsing: '" << e.what() << "'" << std::endl;
+        std::cerr << "CsvParser: Error while parsing command options:" <<  e.what() << std::endl;
         return EXIT_FAILURE;
     }
 
@@ -88,45 +78,38 @@ int main(int argc, const char** argv)
         return EXIT_SUCCESS;
     }
 
-    if (vm.count("debug"))
+    if (true == cvs_file.empty() || true == gtw_table_file.empty())
     {
-        setDbgLevel(debug_level);
+        std::cerr << "CsvParser: incoming csv and output gatway file must be specified !" << std::endl;
+        return EXIT_FAILURE;
     }
 
-    if (vm.count("sink"))
-    {
-        setDbgSink(debug_sink);
-    }
-
-    printDebug("MqttGateway/%s: HomeBrain core <-> MQTT Gateway Starting...", __FUNCTION__);
+    std::cout << "CvsParser: CSV file parser starting..." << std::endl;
 
     try
     {
-        std::unique_ptr<MqttGateway::CMqttGatewayImpl> core_gateway;
-        core_gateway.reset(new MqttGateway::CMqttGatewayImpl(std::make_shared<Parsers::CConfigParser>(config_file.string()),
-                                                             std::make_shared<Parsers::CGtwTableParser>(gtw_table_file.string())));
+//        std::unique_ptr<MqttGateway::CMqttGatewayImpl> core_gateway;
+//        core_gateway.reset(new MqttGateway::CMqttGatewayImpl(std::make_shared<Parsers::CConfigParser>(config_file.string()),
+//                                                             std::make_shared<Parsers::CGtwTableParser>(gtw_table_file.string())));
 
-        core_gateway->performStart();
+//        core_gateway->performStart();
 
         // Setup signal handlers
         configureSignalHandlers();
 
-        while(!isQuit())
-        {
-            std::this_thread::sleep_for(std::chrono::milliseconds(500));
-        }
+        std::this_thread::sleep_for(std::chrono::seconds(2));
 
-        printDebug("MqttGateway/%s: HomeBrain core <-> MQTT Gateway Stopping...", __FUNCTION__);
+        std::cout << "CsvParser: convertation done.." << std::endl;
+        std::cout << "CsvParser: CSV file parser Stopping..." << std::endl;
 
         // close all activity
-        core_gateway->performStop();
+//        core_gateway->performStop();
 
-        printDebug("MqttGateway/%s: HomeBrain core <-> MQTT Gateway Stopped...", __FUNCTION__);
+        std::cout << "CsvParser: CSV file parser Stopped." << std::endl;
     }
     catch (const std::exception& e)
     {
-        printDebug("MqttGateway/%s: Error description: %s", __FUNCTION__, e.what());
-        printDebug("MqttGateway/%s: Gateway is closings", __FUNCTION__);
+        std::cerr << "CsvParser: Error while parsing gtw file:" <<  e.what() << std::endl;
         return 1;
     }
 

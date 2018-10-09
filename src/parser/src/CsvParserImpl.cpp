@@ -1,4 +1,4 @@
-#include "parsers/GtwTableParser.hpp"
+#include "../include/parser/CsvParserImpl.hpp"
 
 #include <memory>
 #include <iostream>
@@ -6,8 +6,6 @@
 
 #include <boost/filesystem.hpp>
 #include <boost/property_tree/json_parser.hpp>
-
-#include "common/slog.h"
 
 namespace Parsers
 {
@@ -56,9 +54,9 @@ CGtwTableParser::CGtwTableParser(const std::string& table_path)
                 router_item.mqtt_topic = d_gtw_item.second.get<std::string>(Tbl::c_gtw_item_topic);
                 router_item.topic_sub = d_gtw_item.second.get<bool>(Tbl::c_gtw_item_subscription);
 
-                printDebug("CGtwTableParser/%s: d_num = %i / s = %i / topic = %s", __FUNCTION__, router_item.number,
-                                                                                               router_item.topic_sub,
-                                                                                               router_item.mqtt_topic.c_str());
+                //printDebug("CGtwTableParser/%s: d_num = %i / s = %i / topic = %s", __FUNCTION__, router_item.number,
+                //                                                                               router_item.topic_sub,
+                //                                                                               router_item.mqtt_topic.c_str());
                 // create discret point rouring table
                 for (pt::ptree::value_type &d_item_mapping : d_gtw_item.second.get_child(Tbl::c_gtw_item_mapping))
                 {
@@ -67,7 +65,7 @@ CGtwTableParser::CGtwTableParser(const std::string& table_path)
 
                    router_item.mapping.push_back(std::make_pair(value_int, value_str));
 
-                   printDebug("CGtwTableParser/%s: int = %i <-> str = %s", __FUNCTION__, value_int, value_str.c_str());
+                   //printDebug("CGtwTableParser/%s: int = %i <-> str = %s", __FUNCTION__, value_int, value_str.c_str());
                 }
                 digitalCheckForMax(router_item.number);
                 m_gwt_vector.push_back(std::make_pair(Tbl::c_gtw_table_d_routing, router_item));
@@ -82,17 +80,17 @@ CGtwTableParser::CGtwTableParser(const std::string& table_path)
                 router_item.mqtt_topic = a_gtw_item.second.get<std::string>(Tbl::c_gtw_item_topic);
                 router_item.topic_sub  = a_gtw_item.second.get<bool>(Tbl::c_gtw_item_subscription);
 
-                printDebug("CGtwTableParser/%s: a_num = %i / s = %i / topic = %s", __FUNCTION__, router_item.number,
-                                                                                               router_item.topic_sub,
-                                                                                               router_item.mqtt_topic.c_str());
+                //printDebug("CGtwTableParser/%s: a_num = %i / s = %i / topic = %s", __FUNCTION__, router_item.number,
+                //                                                                               router_item.topic_sub,
+                //                                                                               router_item.mqtt_topic.c_str());
                 analogCheckForMax(router_item.number);
                 m_gwt_vector.push_back(std::make_pair(Tbl::c_gtw_table_a_routing, router_item));
             }
         }
         catch (const std::exception& e)
         {
-            printError("CGtwTableParser/%s: Error parsing config: %s", __FUNCTION__, table_path.c_str());
-            printError("CGtwTableParser/%s: Error description: %s", __FUNCTION__, e.what());
+            //printError("CGtwTableParser/%s: Error parsing config: %s", __FUNCTION__, table_path.c_str());
+            //printError("CGtwTableParser/%s: Error description: %s", __FUNCTION__, e.what());
             throw;
         }
     }
@@ -100,7 +98,7 @@ CGtwTableParser::CGtwTableParser(const std::string& table_path)
 
 CGtwTableParser::~CGtwTableParser()
 {
-    printDebug("CGtwTableParser/%s: removed...", __FUNCTION__);
+    std::cout << __func__ << ": CCsvParserImpl removed." << std::endl;
 }
 
 void CGtwTableParser::digitalCheckForMax(uint32_t value)

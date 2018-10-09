@@ -1,8 +1,8 @@
 cmake_minimum_required(VERSION 3.4.0)
 
-project(parsers LANGUAGES CXX)
+project(parser LANGUAGES CXX)
 
-message("parsers...")
+message("parser...")
 
 find_package(Boost REQUIRED COMPONENTS thread system filesystem)
 
@@ -11,8 +11,7 @@ if(!Boost_FOUND)
 endif()
 
 add_library(${PROJECT_NAME} STATIC
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/ConfigParser.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/GtwTableParser.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/CsvParserImpl.cpp
     )
 
 target_include_directories(${PROJECT_NAME}
@@ -23,5 +22,4 @@ target_link_libraries(${PROJECT_NAME}
     Boost::boost
     Boost::thread
     Boost::filesystem
-    common
     )

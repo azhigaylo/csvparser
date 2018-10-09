@@ -10,14 +10,10 @@ else()
     message(FATAL_ERROR "Boost NOT FOUND")
 endif()
 
-add_subdirectory(common)
-add_subdirectory(parsers)
-add_subdirectory(gateway)
-add_subdirectory(dataclient)
-add_subdirectory(mqttclient)
+add_subdirectory(parser)
 
 add_executable(${PROJECT_NAME}
-    ${CMAKE_CURRENT_SOURCE_DIR}/MqttGateway.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/CsvParser.cpp
     )
 
 target_link_libraries(${PROJECT_NAME}
@@ -25,7 +21,5 @@ target_link_libraries(${PROJECT_NAME}
     Boost::program_options
     Boost::thread
     Boost::system
-    common
-    parsers
-    gateway
+    parser
     )
