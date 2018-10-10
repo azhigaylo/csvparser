@@ -24,29 +24,60 @@ namespace Tbl
     const std::string c_gtw_item_a_number           = "apoint_number";
 }
 
-CCsvPrserImpl::CCsvPrserImpl(const std::string& table_path)
+CCsvPrserImpl::CCsvPrserImpl(const std::string& csv_prj_path, const std::string& table_path)
+    : m_table_path  (table_path)
+    , m_csv_prj_path(csv_prj_path)
 {
-    if (!boost::filesystem::exists(table_path))
+    if (!boost::filesystem::exists(csv_prj_path))
     {
-        throw std::runtime_error(std::string("configuration unavailable: file is not exist: ") + table_path );
-    }
-    else
-    {
-        try
-        {
-
-        }
-        catch (const std::exception& e)
-        {
-            std::cerr << "CsvParser: Error while parsing gtw file:" <<  e.what() << std::endl;
-            throw;
-        }
+        throw std::runtime_error(std::string("csv file is not exist: ") + m_csv_prj_path );
     }
 }
 
 CCsvPrserImpl::~CCsvPrserImpl()
 {
-    std::cout << __func__ << ": CCsvParserImpl removed." << std::endl;
+    std::cout << "CCsvParserImpl::" << __func__ << ": removed." << std::endl;
+}
+
+void CCsvPrserImpl::parseCsvProject()
+{
+    std::string header("dev num,dev type,port / address,channels,channels description,plc point,operation,description,mqtt topic,mqtt values,N клеммы в шкафу");
+
+
+    boost::optional<uint32_t> plc_point_num = getColumByName(header, "plc point");
+    boost::optional<uint32_t> mqtt_topic_num = getColumByName(header, "mqtt topic");
+
+    if (!plc_point_num || !mqtt_topic_num)
+    {
+       std::cout << "CCsvParserImpl::" << __func__ << ": plc_point_num or mqtt_topic_num missing" << std::endl;
+    }
+    else
+    {
+       std::cout << "CCsvParserImpl::" << __func__ << ": plc_point_num = "  << plc_point_num.get()
+                                                   << " / mqtt_topic_num = "  << mqtt_topic_num.get()
+                                                   << std::endl;
+    }
+}
+
+boost::optional<uint32_t> CCsvPrserImpl::getColumByName(const std::string &header, const std::string &col_name)
+{
+    std::stringstream ss_header(header);
+
+    uint32_t col_counter = 0;
+    while (ss_header.good())
+    {
+        std::string col_value;
+        std::getline (ss_header, col_value, ',');
+
+        std::cout << "CCsvParserImpl::" << __func__ << ": col_value = '" << col_value << "'" << std::endl;
+
+        if (col_value == col_name)
+        {
+            return col_counter;
+        }
+        col_counter++;
+    }
+    return boost::optional<uint32_t>{};
 }
 
 /*

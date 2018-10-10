@@ -88,11 +88,10 @@ int main(int argc, const char** argv)
 
     try
     {
-//        std::unique_ptr<MqttGateway::CMqttGatewayImpl> core_gateway;
-//        core_gateway.reset(new MqttGateway::CMqttGatewayImpl(std::make_shared<Parsers::CConfigParser>(config_file.string()),
-//                                                             std::make_shared<Parsers::CGtwTableParser>(gtw_table_file.string())));
+        std::unique_ptr<Parsers::CCsvPrserImpl> csv_parser;
+        csv_parser.reset(new Parsers::CCsvPrserImpl(cvs_file.string(), gtw_table_file.string()));
 
-//        core_gateway->performStart();
+        csv_parser->parseCsvProject();
 
         // Setup signal handlers
         configureSignalHandlers();
