@@ -54,20 +54,58 @@ CCsvPrserImpl::~CCsvPrserImpl()
 
 void CCsvPrserImpl::parseCsvProject()
 {
-    std::cout << "CCsvParserImpl::" << __func__ << ": parsing result" << std::endl;
-
     if (true == prepareHeaderMap(m_csv_prj_path, m_header_map))
     {
         if (true == prepareGtwVector(m_csv_prj_path, m_gtw_vector))
         {
-            for(gtw_item_tuple_t const& item: m_gtw_vector)
-            {
-                std::cout << std::setw(5) << std::left << ""
-                          << std::get<0>(item) << " : " << std::get<1>(item) << " : "
-                          << std::get<2>(item) << " : " << std::get<3>(item) << std::endl;
-            }
+           createGtwFile(m_table_path, m_gtw_vector);
         }
     }
+}
+
+bool CCsvPrserImpl::createGtwFile(const std::string& gtw_file, const std::vector<gtw_item_tuple_t>& gtw_vector)
+{
+    bool result = false;
+    namespace pt = boost::property_tree;
+
+    pt::ptree gtw_ptree;
+    std::ofstream ss_gtw(gtw_file);
+
+    try
+    {
+        // create items in status
+        pt::ptree items;
+        for(gtw_item_tuple_t const& item: gtw_vector)
+        {
+            if ("DI" == std::get<0>(item))
+            {
+                pt::ptree item_node;
+                item_node.put(GtwTbl::c_gtw_item_d_number,  std::get<1>(item));
+                item_node.put(GtwTbl::c_gtw_item_topic,  std::get<2>(item));
+                item_node.put(GtwTbl::c_gtw_item_subscription,  "false");
+                item_node.put(GtwTbl::c_gtw_item_mapping,  std::get<3>(item));
+
+                items.push_back(std::make_pair("", item_node));
+            }
+        }
+        gtw_ptree.add_child(GtwTbl::c_gtw_table_d_routing, items);
+
+        pt::write_json(ss_gtw, gtw_ptree);
+        ss_gtw.close();
+
+    }
+    catch (const std::exception& e)
+    {
+        std::cerr << "CCsvParserImpl::" << __func__ << ": Error in status calculation, description: " << e.what() << std::endl;
+    }
+
+    for(gtw_item_tuple_t const& item: gtw_vector)
+    {
+       std::cout << std::setw(5) << std::left << ""
+                  << std::get<0>(item) << " : " << std::get<1>(item) << " : "
+                  << std::get<2>(item) << " : " << std::get<3>(item) << std::endl;
+    }
+    return result;
 }
 
 bool CCsvPrserImpl::prepareHeaderMap(const std::string &csv_file, std::map <std::string, uint32_t>& header_map)

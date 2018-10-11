@@ -47,6 +47,7 @@ class CCsvPrserImpl final
         CCsvPrserImpl(const CCsvPrserImpl&) = delete;
         CCsvPrserImpl& operator=(const CCsvPrserImpl&) = delete;
 
+        bool createGtwFile(const std::string &gtw_file, const std::vector<gtw_item_tuple_t>& gtw_vector);
         bool prepareHeaderMap(const std::string &csv_file, std::map <std::string, uint32_t>& header_map);
         bool prepareGtwVector(const std::string &csv_file, std::vector<gtw_item_tuple_t>& gtw_vector);
 
