@@ -84,17 +84,17 @@ int main(int argc, const char** argv)
         return EXIT_FAILURE;
     }
 
-    std::cout << "CvsParser: CSV file parser starting..." << std::endl;
+    // Setup signal handlers
+    configureSignalHandlers();
 
     try
     {
+        std::cout << "CvsParser: CSV file parser starting..." << std::endl;
+
         std::unique_ptr<Parsers::CCsvPrserImpl> csv_parser;
         csv_parser.reset(new Parsers::CCsvPrserImpl(cvs_file.string(), gtw_table_file.string()));
 
         csv_parser->parseCsvProject();
-
-        // Setup signal handlers
-        configureSignalHandlers();
 
         std::this_thread::sleep_for(std::chrono::seconds(2));
 
@@ -108,7 +108,7 @@ int main(int argc, const char** argv)
     }
     catch (const std::exception& e)
     {
-        std::cerr << "CsvParser: Error while parsing gtw file:" <<  e.what() << std::endl;
+        std::cerr << "CsvParser: Error while parsing gtw file: " <<  e.what() << std::endl;
         return 1;
     }
 

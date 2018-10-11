@@ -1,9 +1,8 @@
 #include "../include/parser/CsvParserImpl.hpp"
 
 #include <memory>
-#include <iostream>
+#include <fstream>
 #include <stdexcept>
-
 #include <boost/filesystem.hpp>
 #include <boost/property_tree/json_parser.hpp>
 
@@ -24,7 +23,7 @@ namespace GtwTbl
     const std::string c_gtw_item_a_number            = "apoint_number";
 }
 
-namespace GtwTbl
+namespace CsvTbl
 {
     const std::string c_csv_dev_number               = "dev num";
     const std::string c_csv_dev_type                 = "dev type";
@@ -55,22 +54,113 @@ CCsvPrserImpl::~CCsvPrserImpl()
 
 void CCsvPrserImpl::parseCsvProject()
 {
-    std::string header("dev num,dev type,port / address,channels,channels description,plc point,operation,description,mqtt topic,mqtt values,N клеммы в шкафу");
+    std::cout << "CCsvParserImpl::" << __func__ << ": parsing result" << std::endl;
 
-
-    boost::optional<uint32_t> plc_point_num = getColumByName(header, "plc point");
-    boost::optional<uint32_t> mqtt_topic_num = getColumByName(header, "mqtt topic");
-
-    if (!plc_point_num || !mqtt_topic_num)
+    if (true == prepareHeaderMap(m_csv_prj_path, m_header_map))
     {
-       std::cout << "CCsvParserImpl::" << __func__ << ": plc_point_num or mqtt_topic_num missing" << std::endl;
+        if (true == prepareGtwVector(m_csv_prj_path, m_gtw_vector))
+        {
+            for(gtw_item_tuple_t const& item: m_gtw_vector)
+            {
+                std::cout << std::setw(5) << std::left << ""
+                          << std::get<0>(item) << " : " << std::get<1>(item) << " : "
+                          << std::get<2>(item) << " : " << std::get<3>(item) << std::endl;
+            }
+        }
     }
-    else
+}
+
+bool CCsvPrserImpl::prepareHeaderMap(const std::string &csv_file, std::map <std::string, uint32_t>& header_map)
+{
+    bool result = false;
+    std::ifstream fs_csv_file(csv_file, std::ifstream::in);
+
+    if (true == fs_csv_file.is_open())
     {
-       std::cout << "CCsvParserImpl::" << __func__ << ": plc_point_num = "  << plc_point_num.get()
-                                                   << " / mqtt_topic_num = "  << mqtt_topic_num.get()
-                                                   << std::endl;
+        // read first line from file
+        std::string header_str;
+        std::getline(fs_csv_file, header_str);
+
+        // parse it
+        std::stringstream ss_header(header_str);
+
+        uint32_t col_counter = 0;
+        while (ss_header.good())
+        {
+            std::string col_value;
+            std::getline (ss_header, col_value, ',');
+            header_map.emplace(col_value, col_counter);
+
+            std::cout << "CCsvParserImpl::" << __func__ << ": pos = " << col_counter << ", col_value = '" << col_value << "'" << std::endl;
+
+            col_counter++;
+        }
+
+        fs_csv_file.close();
+        result = true;
     }
+    return result;
+}
+
+bool CCsvPrserImpl::prepareGtwVector(const std::string &csv_file, std::vector<gtw_item_tuple_t>& gtw_vector)
+{
+    bool result = false;
+    std::ifstream fs_csv_file(csv_file, std::ifstream::in);
+
+    if (true == fs_csv_file.is_open())
+    {
+        // skip header string
+        std::string data_str;
+        std::getline(fs_csv_file, data_str);
+
+        while (fs_csv_file.good())
+        {
+            std::getline(fs_csv_file, data_str);
+
+            boost::optional<std::string> plc_point_value   = getColumValueByNum(m_header_map.find(CsvTbl::c_csv_plc_point_mapping)->second, data_str);
+            boost::optional<std::string> operation_value   = getColumValueByNum(m_header_map.find(CsvTbl::c_csv_plc_point_operation)->second, data_str);
+            boost::optional<std::string> mqtt_topic_value  = getColumValueByNum(m_header_map.find(CsvTbl::c_csv_plc_point_mqtt_mapping)->second, data_str);
+            boost::optional<std::string> mqtt_values_value = getColumValueByNum(m_header_map.find(CsvTbl::c_csv_plc_point_mqtt_values)->second, data_str);
+
+            //std::cout << "CCsvParserImpl::" << __func__ << ": " << plc_point_value.get() << " | "
+            //                                                    << operation_value.get() << " | "
+            //                                                    << mqtt_topic_value.get() << " | "
+            //                                                    << mqtt_values_value.get() << std::endl;
+
+            if (plc_point_value && operation_value && mqtt_topic_value && mqtt_values_value)
+            {
+                gtw_item_tuple_t gtw_item_tuple = std::make_tuple(operation_value.get(),  plc_point_value.get(),
+                                                                  mqtt_topic_value.get(), mqtt_values_value.get());
+                gtw_vector.push_back(gtw_item_tuple);
+            }
+            else
+            {
+                throw std::runtime_error(std::string("csv file parsing error!!!"));
+            }
+        }
+        result = true;
+    }
+    return result;
+}
+
+boost::optional<std::string> CCsvPrserImpl::getColumValueByNum(uint32_t colum_num, const std::string &data_str)
+{
+    uint32_t col_counter = 0;
+    std::stringstream ss_header(data_str);
+
+    while (ss_header.good())
+    {
+        std::string col_value;
+        std::getline (ss_header, col_value, ',');
+
+        if (colum_num == col_counter++)
+        {
+            //std::cout << "CCsvParserImpl::" << __func__ << ": colum_num = "   << colum_num
+            //                                            << " | col_value = '" <<  col_value << "'" << std::endl;
+            return col_value;
+        }
+    }
+    return boost::optional<std::string>{};
 }
 
 boost::optional<uint32_t> CCsvPrserImpl::getColumByName(const std::string &header, const std::string &col_name)
