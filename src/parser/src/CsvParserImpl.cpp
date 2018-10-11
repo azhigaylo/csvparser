@@ -10,18 +10,32 @@
 namespace Parsers
 {
 
-namespace Tbl
+namespace GtwTbl
 {
-    const std::string c_gtw_table_main_cfg          = "TableConfig";
-    const std::string c_gtw_table_d_routing         = "DPointRouting";
-    const std::string c_gtw_table_a_routing         = "APointRouting";
-    const std::string c_gtw_item_d_number           = "dpoint_number";
-    const std::string c_gtw_item_topic              = "mqtt_topic";
-    const std::string c_gtw_item_subscription       = "mqtt_subscribe";
-    const std::string c_gtw_item_mapping            = "value_mapping";
-    const std::string c_gtw_item_mapping_value_int  = "value";
-    const std::string c_gtw_item_mapping_value_str  = "mapp_to";
-    const std::string c_gtw_item_a_number           = "apoint_number";
+    const std::string c_gtw_table_main_cfg           = "TableConfig";
+    const std::string c_gtw_table_d_routing          = "DPointRouting";
+    const std::string c_gtw_table_a_routing          = "APointRouting";
+    const std::string c_gtw_item_d_number            = "dpoint_number";
+    const std::string c_gtw_item_topic               = "mqtt_topic";
+    const std::string c_gtw_item_subscription        = "mqtt_subscribe";
+    const std::string c_gtw_item_mapping             = "value_mapping";
+    const std::string c_gtw_item_mapping_value_int   = "value";
+    const std::string c_gtw_item_mapping_value_str   = "mapp_to";
+    const std::string c_gtw_item_a_number            = "apoint_number";
+}
+
+namespace GtwTbl
+{
+    const std::string c_csv_dev_number               = "dev num";
+    const std::string c_csv_dev_type                 = "dev type";
+    const std::string c_csv_dev_interfcae            = "port / address";
+    const std::string c_csv_dev_channels             = "channels";
+    const std::string c_csv_dev_channels_description = "channels description";
+    const std::string c_csv_plc_point_mapping        = "plc point";
+    const std::string c_csv_plc_point_operation      = "operation";
+    const std::string c_csv_plc_point_description    = "description";
+    const std::string c_csv_plc_point_mqtt_mapping   = "mqtt topic";
+    const std::string c_csv_plc_point_mqtt_values    = "mqtt values";
 }
 
 CCsvPrserImpl::CCsvPrserImpl(const std::string& table_path)
