@@ -8,6 +8,9 @@
 #include <iostream>
 
 #include <boost/optional.hpp>
+#include <boost/property_tree/json_parser.hpp>
+#include <boost/date_time/posix_time/posix_time.hpp>
+#include <boost/date_time/posix_time/posix_time_io.hpp>
 
 namespace Parsers
 {
@@ -48,11 +51,13 @@ class CCsvPrserImpl final
         CCsvPrserImpl& operator=(const CCsvPrserImpl&) = delete;
 
         bool createGtwFile(const std::string &gtw_file, const std::vector<gtw_item_tuple_t>& gtw_vector);
+        bool createValueNode(const std::string& value_str, boost::property_tree::ptree& value_node);
         bool prepareHeaderMap(const std::string &csv_file, std::map <std::string, uint32_t>& header_map);
         bool prepareGtwVector(const std::string &csv_file, std::vector<gtw_item_tuple_t>& gtw_vector);
 
         boost::optional<uint32_t> getColumByName(const std::string &header, const std::string &col_name);
         boost::optional<std::string> getColumValueByNum(uint32_t colum_num, const std::string &data_str);
+        std::string getDate_str();
 
         std::string m_table_path;
         std::string m_csv_prj_path;

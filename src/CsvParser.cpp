@@ -96,13 +96,11 @@ int main(int argc, const char** argv)
 
         csv_parser->parseCsvProject();
 
-        std::this_thread::sleep_for(std::chrono::seconds(2));
+        std::this_thread::sleep_for(std::chrono::seconds(1));
 
         std::cout << "CsvParser: convertation done.." << std::endl;
         std::cout << "CsvParser: CSV file parser Stopping..." << std::endl;
 
-        // close all activity
-//        core_gateway->performStop();
 
         std::cout << "CsvParser: CSV file parser Stopped." << std::endl;
     }
