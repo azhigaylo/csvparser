@@ -1,3 +1,10 @@
+/*
+ * Created by Anton Zhigaylo <antoooon@gmail.com>
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the MIT License
+ */
+
 #pragma once
 
 #include <map>
@@ -34,15 +41,7 @@ class CCsvPrserImpl final
         ~CCsvPrserImpl();
 
         void parseCsvProject();
-/*
-        const std::vector<gwt_item_t>& getGwtTable()const {return m_gwt_vector; }
 
-        static const std::string& getDigitalKey();
-        static const std::string& getAnalogKey();
-
-        uint32_t getDigitalPointAmount()const {return m_digital_max_number;}
-        uint32_t getAnalogPointAmount()const {return m_analog_max_number;}
-*/
     private:
         typedef std::pair <std::string, uint32_t> header_item_t;
         typedef std::tuple<std::string, std::string, std::string, std::string> gtw_item_tuple_t;
@@ -63,10 +62,6 @@ class CCsvPrserImpl final
         std::string m_csv_prj_path;
         std::map <std::string, uint32_t> m_header_map;
         std::vector<gtw_item_tuple_t>    m_gtw_vector;
-
-/*
-        std::vector<gwt_item_t> m_gwt_vector;
-*/
 };
 
 } //namespace Parsers
