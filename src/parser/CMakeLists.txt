@@ -4,7 +4,7 @@ project(parser LANGUAGES CXX)
 
 message("parser...")
 
-find_package(Boost REQUIRED COMPONENTS thread system filesystem)
+find_package(Boost REQUIRED COMPONENTS thread system filesystem date_time)
 
 if(!Boost_FOUND)
     message(FATAL_ERROR "Boost NOT FOUND")
@@ -22,4 +22,5 @@ target_link_libraries(${PROJECT_NAME}
     Boost::boost
     Boost::thread
     Boost::filesystem
+    Boost::date_time
     )

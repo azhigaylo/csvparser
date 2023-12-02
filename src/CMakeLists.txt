@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.4.0)
 
-find_package(Boost REQUIRED COMPONENTS thread system program_options)
+find_package(Boost REQUIRED COMPONENTS thread system program_options date_time)
 
 if(Boost_FOUND)
     message("Boost_FOUND !!!!")
@@ -21,5 +21,6 @@ target_link_libraries(${PROJECT_NAME}
     Boost::program_options
     Boost::thread
     Boost::system
+    Boost::date_time
     parser
     )
